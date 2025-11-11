@@ -16,6 +16,18 @@ ULONG_PTR gdiplusToken;
 int X = GetSystemMetrics(SM_CXSCREEN);
 int Y = GetSystemMetrics(SM_CYSCREEN);
 
+int x = 0;
+int y = 0;
+
+void input() {
+    if (GetAsyncKeyState('D')) {
+        x += 100;
+    }
+    if (GetAsyncKeyState('A')) {
+        x -= 100;
+    }
+}
+
 //int ImX = ;
 //int ImY = ;
 
@@ -60,16 +72,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (true) //зачем тут GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-           
-
+        {           
+        WM_KEYDOWN:
+            switch (wParam)
+            {
+            case 'd':
+                for (;x<X;x+=100)
+            }
+            return 0;
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-
-
+            
         }
     }
 
@@ -169,20 +185,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
 
             Gdiplus::Graphics graphics(hdc);
-            Gdiplus::Image* image = Gdiplus::Image::FromFile(L"Flame.bmp");
+            Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
+            Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
 
-            if (image->GetLastStatus() == Gdiplus::Status::Ok)
+            int WCrter = Crter->GetWidth();
+            int HCrter = Crter->GetHeight();
+
+            if (BG->GetLastStatus() == Gdiplus::Status::Ok)
             {
                 for (int i = 0; i < X; i += 512)
                 {
                     for (int O = 0; O < Y; O += 512)
                     {
-                        graphics.DrawImage(image, i, O);
+                        graphics.DrawImage(BG, i, O);
+
+
                     }
                 }
 
-                delete image;
+                delete BG;
             }
+
+            if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
+            {
+               graphics.DrawImage(Crter, x, y);
+            }
+            delete Crter;
 
             // TODO: Add any drawing code that uses hdc here...
 
@@ -206,6 +234,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
+
+    
+
     case WM_DESTROY:
         Gdiplus::GdiplusShutdown(gdiplusToken); // GDI+ close
         PostQuitMessage(0);

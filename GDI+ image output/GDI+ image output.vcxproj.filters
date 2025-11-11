@@ -48,5 +48,8 @@
     <Image Include="Flame.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="stickman.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
