@@ -6,6 +6,7 @@
 
 #include <objidl.h>
 #include <gdiplus.h>
+#include <windowsx.h>
 
 #pragma comment (lib, "Gdiplus.lib")
 
@@ -14,6 +15,8 @@
 ULONG_PTR gdiplusToken;
 HWND hWnd;
 
+bool drawRectangle = false;
+
 //window size
 int X = GetSystemMetrics(SM_CXSCREEN);
 int Y = GetSystemMetrics(SM_CYSCREEN);
@@ -21,6 +24,8 @@ int Y = GetSystemMetrics(SM_CYSCREEN);
 //character pose 0
 int x = 0;
 int y = 0;
+
+
 
 //char control move
 void CharMove() {
@@ -35,6 +40,14 @@ void CharMove() {
     }
     if (GetAsyncKeyState('W')) {
         y -= 25;
+    }
+    if (GetAsyncKeyState(VK_LBUTTON))
+    {
+        drawRectangle = true;
+    }
+    else
+    {
+        drawRectangle = false;
     }
 }
 
@@ -155,6 +168,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
 
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -195,9 +209,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         delete unit;
 
+        int MouseX = GET_X_LPARAM(lParam);
+        int MouseY = GET_Y_LPARAM(lParam);
+
         //draw rectangle selecting units
-        Gdiplus::Pen myRedPen(Gdiplus::Color(255, 255, 0, 0), 3);
-        backGraphics->DrawRectangle(&myRedPen, 20, 10, 100, 50);
+        if (drawRectangle = true)
+        {
+            Gdiplus::Pen myRedPen(Gdiplus::Color(255, 255, 0, 0), 3);
+            backGraphics->DrawRectangle(&myRedPen, MouseX, MouseY, 100, 100);
+        }
 
         //second buffer
         Gdiplus::Graphics screenGraphics(hdc);
