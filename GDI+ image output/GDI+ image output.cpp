@@ -38,6 +38,10 @@ void CharMove() {
     }
 }
 
+//void SelectUnit() {
+//    if()
+//}
+
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
@@ -82,9 +86,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
                 running = false;
             }
         }
+        else
         {
             CharMove();
             InvalidateRect(hWnd, nullptr, FALSE);
+           // Sleep(10);
         }
     }
 }
@@ -154,12 +160,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
+        
+
         Gdiplus::Bitmap backBuffer(X, Y);
         Gdiplus::Graphics* backGraphics = Gdiplus::Graphics::FromImage(&backBuffer);
 
         Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
-        Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
+        Gdiplus::Image* unit = Gdiplus::Image::FromFile(L"stickman.bmp");
 
+        
+        //draw BG
         if (BG && BG->GetLastStatus() == Gdiplus::Status::Ok)
         {
             for (int i = 0; i < X; i += 512)
@@ -172,15 +182,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             delete BG;
         }
 
-        if (Crter && Crter->GetLastStatus() == Gdiplus::Status::Ok)
+        //draw unit
+        if (unit && unit->GetLastStatus() == Gdiplus::Status::Ok)
         {
-            backGraphics->DrawImage(Crter, x, y);
-        }
-        delete Crter;
+            int originalWidth = unit->GetWidth();
+            int originalHeight = unit->GetHeight();
 
+            int newWidth = 100;
+            int newHeight = 100;
+
+            backGraphics->DrawImage(unit, x, y, newWidth, newHeight);
+        }
+        delete unit;
+
+        //draw rectangle selecting units
+        Gdiplus::Pen myRedPen(Gdiplus::Color(255, 255, 0, 0), 3);
+        backGraphics->DrawRectangle(&myRedPen, 20, 10, 100, 50);
+
+        //second buffer
         Gdiplus::Graphics screenGraphics(hdc);
         screenGraphics.DrawImage(&backBuffer, 0, 0, 0, 0, X, Y, Gdiplus::UnitPixel);
-
         delete backGraphics;
 
         EndPaint(hWnd, &ps);
