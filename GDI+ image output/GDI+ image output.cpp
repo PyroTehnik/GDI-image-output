@@ -1,4 +1,4 @@
-// GDI+ image output.cpp : Defines the entry point for the application.
+п»ї// GDI+ image output.cpp : Defines the entry point for the application.
 //
 
 #include "framework.h"
@@ -28,15 +28,10 @@ void input() {
     }
 }
 
-//int ImX = ;
-//int ImY = ;
+HINSTANCE hInst;
+WCHAR szTitle[MAX_LOADSTRING];
+WCHAR szWindowClass[MAX_LOADSTRING];
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
-// Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -45,24 +40,21 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: Place code here.
     Gdiplus::GdiplusStartupInput gdiplusStartupInput; // GDI+ open
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-    // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_GDIIMAGEOUTPUT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -71,171 +63,112 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // Main message loop:
-    while (true) //зачем тут GetMessage(&msg, nullptr, 0, 0))
+    while (true)
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {           
-        WM_KEYDOWN:
-            switch (wParam)
-            {
-            case 'd':
-                for (;x<X;x+=100)
-            }
-            return 0;
+        {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-            
         }
     }
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
-
-
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GDIIMAGEOUTPUT));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_GDIIMAGEOUTPUT);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GDIIMAGEOUTPUT));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_GDIIMAGEOUTPUT);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   return TRUE;
+    return TRUE;
 }
 
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+
+        Gdiplus::Graphics graphics(hdc);
+        Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
+        Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
+
+        int WCrter = Crter->GetWidth();
+        int HCrter = Crter->GetHeight();
+
+        if (BG->GetLastStatus() == Gdiplus::Status::Ok)
         {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-
-            Gdiplus::Graphics graphics(hdc);
-            Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
-            Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
-
-            int WCrter = Crter->GetWidth();
-            int HCrter = Crter->GetHeight();
-
-            if (BG->GetLastStatus() == Gdiplus::Status::Ok)
+            for (int i = 0; i < X; i += 512)
             {
-                for (int i = 0; i < X; i += 512)
+                for (int O = 0; O < Y; O += 512)
                 {
-                    for (int O = 0; O < Y; O += 512)
-                    {
-                        graphics.DrawImage(BG, i, O);
+                    graphics.DrawImage(BG, i, O);
 
 
-                    }
                 }
-
-                delete BG;
             }
 
-            if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
-            {
-               graphics.DrawImage(Crter, x, y);
-            }
-            delete Crter;
-
-            // TODO: Add any drawing code that uses hdc here...
-
-           /*
-           //Красная линия
-            Gdiplus::Pen pen(Gdiplus::Color(255, 255, 0, 0), 2); // Цвет (A, R, G, B), толщина
-            graphics.DrawLine(&pen, 10, 10, 200, 50);
-
-            //синий текст
-            Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 255));
-            Gdiplus::FontFamily fontFamily(L"Arial");
-            Gdiplus::Font font(&fontFamily, 24, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
-            Gdiplus::PointF pointF(10.0f, 60.0f);
-
-            graphics.DrawString(L"Привет, GDI+!", -1, &font, pointF, &brush);
-            */
-
-
-
-
-            EndPaint(hWnd, &ps);
+            delete BG;
         }
-        break;
 
-    
+        if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
+        {
+            graphics.DrawImage(Crter, x, y);
+        }
+        delete Crter;
+        EndPaint(hWnd, &ps);
+    }
+    break;
 
     case WM_DESTROY:
         Gdiplus::GdiplusShutdown(gdiplusToken); // GDI+ close
@@ -247,7 +180,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
