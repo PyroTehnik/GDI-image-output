@@ -22,14 +22,12 @@ int y = 0;
 
 void input() {
     if (GetAsyncKeyState('D')) {
-        x += 100;
+        x += 25;
     }
     if (GetAsyncKeyState('A')) {
-        x -= 100;
+        x -= 25;
     }
 }
-
-
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -172,34 +170,65 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        Gdiplus::Graphics graphics(hdc);
+        Gdiplus::Bitmap backBuffer(X, Y);
+        Gdiplus::Graphics* backGraphics = Gdiplus::Graphics::FromImage(&backBuffer);
+
+       // Gdiplus::Graphics graphics(hdc);
+
         Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
         Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
 
-        int WCrter = Crter->GetWidth();
-        int HCrter = Crter->GetHeight();
-
-        //DRAW BG
-        if (BG->GetLastStatus() == Gdiplus::Status::Ok)
+        if (BG && BG->GetLastStatus() == Gdiplus::Status::Ok)
         {
             for (int i = 0; i < X; i += 512)
             {
                 for (int O = 0; O < Y; O += 512)
                 {
-                    graphics.DrawImage(BG, i, O);
-
-
+                    backGraphics->DrawImage(BG, i, O);
                 }
             }
-
             delete BG;
         }
 
-        if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
+        if (Crter && Crter->GetLastStatus() == Gdiplus::Status::Ok)
         {
-            graphics.DrawImage(Crter, x, y);
+            backGraphics->DrawImage(Crter, x, y);
         }
         delete Crter;
+
+        //Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
+        //Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
+
+        //int WCrter = Crter->GetWidth();
+        //int HCrter = Crter->GetHeight();
+
+        ////DRAW BG
+        //if (BG->GetLastStatus() == Gdiplus::Status::Ok)
+        //{
+        //    for (int i = 0; i < X; i += 512)
+        //    {
+        //        for (int O = 0; O < Y; O += 512)
+        //        {
+        //            graphics.DrawImage(BG, i, O);
+
+
+        //        }
+        //    }
+
+        //    delete BG;
+        //}
+
+        //if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
+        //{
+        //    graphics.DrawImage(Crter, x, y);
+        //}
+        //delete Crter;
+
+        Gdiplus::Graphics screenGraphics(hdc);
+        screenGraphics.DrawImage(&backBuffer, 0, 0, 0, 0, X, Y, Gdiplus::UnitPixel);
+
+        delete backGraphics;
+
         EndPaint(hWnd, &ps);
     }
     break;
