@@ -14,13 +14,16 @@
 ULONG_PTR gdiplusToken;
 HWND hWnd;
 
+//window size
 int X = GetSystemMetrics(SM_CXSCREEN);
 int Y = GetSystemMetrics(SM_CYSCREEN);
 
+//character pose 0
 int x = 0;
 int y = 0;
 
-void input() {
+//char control move
+void CharMove() {
     if (GetAsyncKeyState('D')) {
         x += 25;
     }
@@ -70,7 +73,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
     while (running)
     {
-        // 1. Обрабатываем ВСЕ доступные сообщения в очереди
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
@@ -80,64 +82,12 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
                 running = false;
             }
         }
-        else // <-- Если сообщений не было, или после их обработки
         {
-            // 2. Выполняем игровую логику и запрашиваем перерисовку
-            input();
-            // hWnd - это глобальная переменная, которую вы инициализировали 
-            // в InitInstance, но она там локальна. Нужен доступ к глобальной hWnd. 
-            // (см. примечание ниже)
+            CharMove();
             InvalidateRect(hWnd, nullptr, FALSE);
-            Sleep(10); // Задержка для управления FPS и снижения нагрузки на ЦП
         }
     }
 }
-
-//        MSG msg;
-//        bool running = true;
-//    
-//        while (running)
-//        {
-//            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-//            {
-//                input();
-//                InvalidateRect(hWnd, nullptr, FALSE);
-//                Sleep(10);
-//                TranslateMessage(&msg);
-//                DispatchMessage(&msg);
-//                if (msg.message == WM_QUIT)
-//                {
-//                    running = false;
-//                }            }
-//            /*else
-//            {
-//                input();
-//                InvalidateRect(hWnd, nullptr, FALSE);
-//                Sleep(10);
-//            }*/
-//        }
-//}   
-
-//    MSG msg;
-//
-//    while (GetMessage(&msg, nullptr, 0, 0))
-//    {
-//        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-//        {
-//            TranslateMessage(&msg);
-//            DispatchMessage(&msg);
-//        }
-//        else
-//        {
-//            input();
-//           // InvalidateRect(HWND, nullptr, FALSE);
-//           // Sleep(10);
-//        }
-//        
-//    }
-//
-//    return (int)msg.wParam;
-//}
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
@@ -207,8 +157,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         Gdiplus::Bitmap backBuffer(X, Y);
         Gdiplus::Graphics* backGraphics = Gdiplus::Graphics::FromImage(&backBuffer);
 
-       // Gdiplus::Graphics graphics(hdc);
-
         Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
         Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
 
@@ -229,34 +177,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             backGraphics->DrawImage(Crter, x, y);
         }
         delete Crter;
-
-        //Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
-        //Gdiplus::Image* Crter = Gdiplus::Image::FromFile(L"stickman.bmp");
-
-        //int WCrter = Crter->GetWidth();
-        //int HCrter = Crter->GetHeight();
-
-        ////DRAW BG
-        //if (BG->GetLastStatus() == Gdiplus::Status::Ok)
-        //{
-        //    for (int i = 0; i < X; i += 512)
-        //    {
-        //        for (int O = 0; O < Y; O += 512)
-        //        {
-        //            graphics.DrawImage(BG, i, O);
-
-
-        //        }
-        //    }
-
-        //    delete BG;
-        //}
-
-        //if (Crter->GetLastStatus() == Gdiplus::Status::Ok)
-        //{
-        //    graphics.DrawImage(Crter, x, y);
-        //}
-        //delete Crter;
 
         Gdiplus::Graphics screenGraphics(hdc);
         screenGraphics.DrawImage(&backBuffer, 0, 0, 0, 0, X, Y, Gdiplus::UnitPixel);
