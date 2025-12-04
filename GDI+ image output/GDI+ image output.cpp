@@ -118,6 +118,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -134,6 +135,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
     }
     break;
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -146,6 +148,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int WCrter = Crter->GetWidth();
         int HCrter = Crter->GetHeight();
 
+        //DRAW BG
         if (BG->GetLastStatus() == Gdiplus::Status::Ok)
         {
             for (int i = 0; i < X; i += 512)
