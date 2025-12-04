@@ -27,6 +27,12 @@ void input() {
     if (GetAsyncKeyState('A')) {
         x -= 25;
     }
+    if (GetAsyncKeyState('S')) {
+        y += 25;
+    }
+    if (GetAsyncKeyState('W')) {
+        y -= 25;
+    }
 }
 
 HINSTANCE hInst;
@@ -59,30 +65,58 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_GDIIMAGEOUTPUT));
 
+    MSG msg;
+    bool running = true;
 
-        MSG msg;
-        bool running = true;
-    
-        while (running)
+    while (running)
+    {
+        // 1. Обрабатываем ВСЕ доступные сообщения в очереди
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+            if (msg.message == WM_QUIT)
             {
-                if (msg.message == WM_QUIT)
-                {
-                    running = false;
-                }
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-            else
-            {
-                input();
-                InvalidateRect(hWnd, nullptr, FALSE);
-                Sleep(10);
+                running = false;
             }
         }
-}   
+        else // <-- Если сообщений не было, или после их обработки
+        {
+            // 2. Выполняем игровую логику и запрашиваем перерисовку
+            input();
+            // hWnd - это глобальная переменная, которую вы инициализировали 
+            // в InitInstance, но она там локальна. Нужен доступ к глобальной hWnd. 
+            // (см. примечание ниже)
+            InvalidateRect(hWnd, nullptr, FALSE);
+            Sleep(10); // Задержка для управления FPS и снижения нагрузки на ЦП
+        }
+    }
+}
 
+//        MSG msg;
+//        bool running = true;
+//    
+//        while (running)
+//        {
+//            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+//            {
+//                input();
+//                InvalidateRect(hWnd, nullptr, FALSE);
+//                Sleep(10);
+//                TranslateMessage(&msg);
+//                DispatchMessage(&msg);
+//                if (msg.message == WM_QUIT)
+//                {
+//                    running = false;
+//                }            }
+//            /*else
+//            {
+//                input();
+//                InvalidateRect(hWnd, nullptr, FALSE);
+//                Sleep(10);
+//            }*/
+//        }
+//}   
 
 //    MSG msg;
 //
@@ -130,7 +164,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance;
 
-    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+    hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
