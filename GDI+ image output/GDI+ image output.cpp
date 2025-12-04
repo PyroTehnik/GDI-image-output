@@ -12,6 +12,7 @@
 #define MAX_LOADSTRING 100
 
 ULONG_PTR gdiplusToken;
+HWND hWnd;
 
 int X = GetSystemMetrics(SM_CXSCREEN);
 int Y = GetSystemMetrics(SM_CYSCREEN);
@@ -28,6 +29,8 @@ void input() {
     }
 }
 
+
+
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
@@ -37,12 +40,9 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -61,19 +61,51 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_GDIIMAGEOUTPUT));
 
-    MSG msg;
 
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        MSG msg;
+        bool running = true;
+    
+        while (running)
         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
+                if (msg.message == WM_QUIT)
+                {
+                    running = false;
+                }
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+            else
+            {
+                input();
+                InvalidateRect(hWnd, nullptr, FALSE);
+                Sleep(10);
+            }
         }
-    }
+}   
 
-    return (int)msg.wParam;
-}
+
+//    MSG msg;
+//
+//    while (GetMessage(&msg, nullptr, 0, 0))
+//    {
+//        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+//        {
+//            TranslateMessage(&msg);
+//            DispatchMessage(&msg);
+//        }
+//        else
+//        {
+//            input();
+//           // InvalidateRect(HWND, nullptr, FALSE);
+//           // Sleep(10);
+//        }
+//        
+//    }
+//
+//    return (int)msg.wParam;
+//}
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
@@ -98,7 +130,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance;
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
