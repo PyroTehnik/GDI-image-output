@@ -25,7 +25,11 @@ int Y = GetSystemMetrics(SM_CYSCREEN);
 int x = 0;
 int y = 0;
 
-
+//Rect select units coordinates
+int RectSXStart = 0;
+int RectSYStart = 0;
+int RectSXEnd = 0;
+int RectSYEnd = 0;
 
 //char control move
 void CharMove() {
@@ -41,19 +45,15 @@ void CharMove() {
     if (GetAsyncKeyState('W')) {
         y -= 25;
     }
-    if (GetAsyncKeyState(VK_LBUTTON))
+    if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) //get returns a 16-bit number that determines whether the key is pressed, but to read it, you need a high-bit mask of 0x8000
     {
         drawRectangle = true;
     }
-    else
+    else 
     {
         drawRectangle = false;
     }
 }
-
-//void SelectUnit() {
-//    if()
-//}
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -168,21 +168,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
 
+    case WM_LBUTTONDOWN:
+        drawRectangle = true;
+        RectSXStart = GET_X_LPARAM(lParam);
+        RectSYStart = GET_Y_LPARAM(lParam);
+        RectSXEnd = RectSXStart;
+        RectSYEnd = RectSYStart;
+        SetCapture(hWnd);
+        break;
+
+    case WM_MOUSEMOVE:
+        if (drawRectangle)
+        {
+            RectSXEnd = GET_X_LPARAM(lParam);
+            RectSYEnd = GET_Y_LPARAM(lParam);
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
+        break;
+
+    case WM_LBUTTONUP:
+        drawRectangle = false;
+        ReleaseCapture();
+        InvalidateRect(hWnd, nullptr, FALSE);
+        break;
 
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        
-
         Gdiplus::Bitmap backBuffer(X, Y);
         Gdiplus::Graphics* backGraphics = Gdiplus::Graphics::FromImage(&backBuffer);
 
         Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
         Gdiplus::Image* unit = Gdiplus::Image::FromFile(L"stickman.bmp");
-
-        
+                
         //draw BG
         if (BG && BG->GetLastStatus() == Gdiplus::Status::Ok)
         {
@@ -193,8 +213,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     backGraphics->DrawImage(BG, i, O);
                 }
             }
-            delete BG;
         }
+        delete BG;
 
         //draw unit
         if (unit && unit->GetLastStatus() == Gdiplus::Status::Ok)
@@ -213,10 +233,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int MouseY = GET_Y_LPARAM(lParam);
 
         //draw rectangle selecting units
-        if (drawRectangle = true)
+        if (drawRectangle == true)
         {
-            Gdiplus::Pen myRedPen(Gdiplus::Color(255, 255, 0, 0), 3);
-            backGraphics->DrawRectangle(&myRedPen, MouseX, MouseY, 100, 100);
+            Gdiplus::Pen myRedPen(Gdiplus::Color(255, 100, 255, 0), 3);
+
+            int RectSX = min(RectSXStart, RectSXEnd);
+            int RectSY = min(RectSYStart, RectSYEnd);
+            int RectSWigth = abs(RectSYEnd-RectSYStart);
+            int RectSHeigh = abs(RectSXEnd-RectSXStart);
+
+            backGraphics->DrawRectangle(&myRedPen, RectSX, RectSY, RectSHeigh, RectSWigth);
         }
 
         //second buffer
