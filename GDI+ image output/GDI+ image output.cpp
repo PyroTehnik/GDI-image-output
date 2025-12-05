@@ -16,14 +16,27 @@ ULONG_PTR gdiplusToken;
 HWND hWnd;
 
 bool drawRectangle = false;
+bool SelectUnit = false;
 
 //window size
 int X = GetSystemMetrics(SM_CXSCREEN);
 int Y = GetSystemMetrics(SM_CYSCREEN);
 
-//character pose 0
-int x = 0;
-int y = 0;
+//struct unit {
+//    int PosUnit;
+//    int HitboxUnit;
+//    int NumberUnit;
+//};
+int PosUnit[] = { 100, 100 };
+int HitboxUnit[] = { 100 + 50, 100 + 50 };
+int NumberUnit;
+
+//unit pose 0
+int PosUnitX = 100;
+int PosUnitY = 100;
+
+int newWidth = 50;
+int newHeight = 50;
 
 //Rect select units coordinates
 int RectSXStart = 0;
@@ -34,16 +47,16 @@ int RectSYEnd = 0;
 //char control move
 void CharMove() {
     if (GetAsyncKeyState('D')) {
-        x += 25;
+        PosUnit[0] += 25;
     }
     if (GetAsyncKeyState('A')) {
-        x -= 25;
+        PosUnit[0] -= 25;
     }
     if (GetAsyncKeyState('S')) {
-        y += 25;
+        PosUnit[1] += 25;
     }
     if (GetAsyncKeyState('W')) {
-        y -= 25;
+        PosUnit[1] -= 25;
     }
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) //get returns a 16-bit number that determines whether the key is pressed, but to read it, you need a high-bit mask of 0x8000
     {
@@ -133,8 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance;
 
-    hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)
     {
@@ -151,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_COMMAND:
+    /*case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
         switch (wmId)
@@ -166,7 +178,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
     }
-    break;
+    break;*/
 
     case WM_LBUTTONDOWN:
         drawRectangle = true;
@@ -220,12 +232,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (unit && unit->GetLastStatus() == Gdiplus::Status::Ok)
         {
             int originalWidth = unit->GetWidth();
-            int originalHeight = unit->GetHeight();
+            int originalHeight = unit->GetHeight();            
 
-            int newWidth = 100;
-            int newHeight = 100;
-
-            backGraphics->DrawImage(unit, x, y, newWidth, newHeight);
+            backGraphics->DrawImage(unit, PosUnit[0], PosUnit[1], newWidth, newHeight);
         }
         delete unit;
 
@@ -235,15 +244,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //draw rectangle selecting units
         if (drawRectangle == true)
         {
-            Gdiplus::Pen myRedPen(Gdiplus::Color(255, 100, 255, 0), 3);
+            Gdiplus::Pen myRedPen(Gdiplus::Color(255, 100, 255, 0), 2);
 
             int RectSX = min(RectSXStart, RectSXEnd);
             int RectSY = min(RectSYStart, RectSYEnd);
-            int RectSWigth = abs(RectSYEnd-RectSYStart);
             int RectSHeigh = abs(RectSXEnd-RectSXStart);
+            int RectSWigth = abs(RectSYEnd-RectSYStart);
 
             backGraphics->DrawRectangle(&myRedPen, RectSX, RectSY, RectSHeigh, RectSWigth);
         }
+
+        
 
         //second buffer
         Gdiplus::Graphics screenGraphics(hdc);
