@@ -259,10 +259,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         //selection rect
-        Gdiplus::Graphics graph(hdc);
-        Gdiplus::Pen RectCol(Gdiplus::Color(255, 100, 255, 0), 2);
-        Gdiplus::Rect RectPos(PosUnit[0], PosUnit[1], newWidth, newHeight);
-        backGraphics->DrawRectangle(&RectCol, RectPos);
+        if (min(RectSXStart,RectSXEnd) < PosUnit[0] && max(RectSXStart, RectSXEnd) > PosUnit[0]+newWidth)
+        {
+            Gdiplus::Graphics graph(hdc);
+            Gdiplus::Pen RectCol(Gdiplus::Color(255, 100, 255, 0), 2);
+            Gdiplus::Rect RectPos(PosUnit[0], PosUnit[1], newWidth, newHeight);
+            backGraphics->DrawRectangle(&RectCol, RectPos);
+        }
 
         //second buffer
         Gdiplus::Graphics screenGraphics(hdc);
