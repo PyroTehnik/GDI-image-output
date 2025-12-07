@@ -15,6 +15,7 @@
 ULONG_PTR gdiplusToken;
 HWND hWnd;
 
+
 bool drawRectangle = false;
 bool SelectUnit = false;
 
@@ -211,6 +212,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         Gdiplus::Bitmap backBuffer(X, Y);
         Gdiplus::Graphics* backGraphics = Gdiplus::Graphics::FromImage(&backBuffer);
+        
 
         Gdiplus::Image* BG = Gdiplus::Image::FromFile(L"Flame.bmp");
         Gdiplus::Image* unit = Gdiplus::Image::FromFile(L"stickman.bmp");
@@ -235,6 +237,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int originalHeight = unit->GetHeight();            
 
             backGraphics->DrawImage(unit, PosUnit[0], PosUnit[1], newWidth, newHeight);
+
+            
         }
         delete unit;
 
@@ -254,7 +258,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             backGraphics->DrawRectangle(&myRedPen, RectSX, RectSY, RectSHeigh, RectSWigth);
         }
 
-        
+        //selection rect
+        Gdiplus::Graphics graph(hdc);
+        Gdiplus::Pen RectCol(Gdiplus::Color(255, 100, 255, 0), 2);
+        Gdiplus::Rect RectPos(PosUnit[0], PosUnit[1], newWidth, newHeight);
+        backGraphics->DrawRectangle(&RectCol, RectPos);
 
         //second buffer
         Gdiplus::Graphics screenGraphics(hdc);
