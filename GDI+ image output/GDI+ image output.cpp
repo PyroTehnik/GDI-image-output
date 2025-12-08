@@ -63,9 +63,13 @@ void CharMove() {
     {
         drawRectangle = true;
     }
-    else 
+    else
     {
         drawRectangle = false;
+    }
+    if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+    {
+        SelectUnit = false;
     }
 }
 
@@ -205,6 +209,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         InvalidateRect(hWnd, nullptr, FALSE);
         break;
 
+    
+
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -259,7 +265,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
 
         //selection rect
-        if (min(RectSXStart,RectSXEnd) < PosUnit[0] && max(RectSXStart, RectSXEnd) > PosUnit[0]+newWidth)
+        if (min(RectSXStart,RectSXEnd) < PosUnit[0] & max(RectSXStart, RectSXEnd) > PosUnit[0]+newWidth)
+        {
+            SelectUnit = true;
+        }
+
+        if (SelectUnit)
         {
             Gdiplus::Graphics graph(hdc);
             Gdiplus::Pen RectCol(Gdiplus::Color(255, 100, 255, 0), 2);
