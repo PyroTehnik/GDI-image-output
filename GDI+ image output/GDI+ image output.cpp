@@ -62,6 +62,7 @@ void CharMove() {
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) //get returns a 16-bit number that determines whether the key is pressed, but to read it, you need a high-bit mask of 0x8000
     {
         drawRectangle = true;
+        SelectUnit = false;
     }
     else
     {
@@ -168,23 +169,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    /*case WM_COMMAND:
-    {
-        int wmId = LOWORD(wParam);
-        switch (wmId)
-        {
-        case IDM_ABOUT:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-            break;
-        case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
-        }
-    }
-    break;*/
-
     case WM_LBUTTONDOWN:
         drawRectangle = true;
         RectSXStart = GET_X_LPARAM(lParam);
@@ -208,8 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ReleaseCapture();
         InvalidateRect(hWnd, nullptr, FALSE);
         break;
-
-    
+           
 
     case WM_PAINT:
     {
@@ -248,11 +231,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         delete unit;
 
-        int MouseX = GET_X_LPARAM(lParam);
-        int MouseY = GET_Y_LPARAM(lParam);
-
         //draw rectangle selecting units
-        if (drawRectangle == true)
+        if (drawRectangle)
         {
             Gdiplus::Pen myRedPen(Gdiplus::Color(255, 100, 255, 0), 2);
 
