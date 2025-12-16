@@ -7,10 +7,13 @@
 #include <objidl.h>
 #include <gdiplus.h>
 #include <windowsx.h>
+#include <vector>
 
 #pragma comment (lib, "Gdiplus.lib")
 
 #define MAX_LOADSTRING 100
+
+using namespace std;
 
 ULONG_PTR gdiplusToken;
 HWND hWnd;
@@ -18,6 +21,8 @@ HWND hWnd;
 
 bool drawRectangle = false;
 bool SelectUnit = false;
+bool TrackMove = false;
+bool ControlUnit = false;
 
 //window size
 int X = GetSystemMetrics(SM_CXSCREEN);
@@ -45,9 +50,7 @@ int RectSYEnd = 0;
 
 POINT pt;
 
-
-int Xmouse = pt.x;
-int Ymouse = pt.y;
+int OPU[] = { PosUnit[0]+ pt.x ,PosUnit[1]+ pt.y };
 
 //char control move
 void CharMove() {
@@ -199,6 +202,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ReleaseCapture();
         InvalidateRect(hWnd, nullptr, FALSE);
         break;
+
+    case WM_RBUTTONDOWN:
+        if(SelectUnit)
+        {
+            GetCursorPos(&pt);
+            ScreenToClient(hWnd, &pt);
+
+            PosUnit[0] = pt.x - (newWidth / 2);
+            PosUnit[1] = pt.y - (newHeight / 2);
+        }
+        
+
+    case WM_RBUTTONUP:
+        TrackMove = true;
            
 
     case WM_PAINT:
@@ -226,6 +243,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         delete BG;
 
+        if (TrackMove)
+        {
+            /*vector<int, int>*Pos = new vector<int, int>();
+            Pos[0].push_back(PosUnit[0] + (newWidth / 2));
+            Pos[1].push_back(PosUnit[1] + (newHeight / 2));
+            Gdiplus::Graphics LineMove(hdc);
+            Gdiplus::Pen LineCol(Gdiplus::Color(255, 100, 255, 0), 2);
+            backGraphics->DrawLine(&LineCol, 1, 1, pt.x, pt.y);
+            delete Pos;*/
+
+            vector<int>pos;
+            pos.push_back(PosUnit[0] + (newWidth / 2));
+            pos.push_back(PosUnit[1] + (newHeight / 2));
+            Gdiplus::Graphics LineMove(hdc);
+            Gdiplus::Pen LineCol(Gdiplus::Color(255, 100, 255, 0), 2);
+            backGraphics->DrawLine(&LineCol, pos[0], pos[1], pt.x, pt.y);
+        }
+
         //draw unit
         if (unit && unit->GetLastStatus() == Gdiplus::Status::Ok)
         {
@@ -234,13 +269,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             backGraphics->DrawImage(unit, PosUnit[0], PosUnit[1], newWidth, newHeight);
 
-            if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) && SelectUnit)
+            /*if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) && SelectUnit)
             {
                 GetCursorPos(&pt);
                 ScreenToClient(hWnd, &pt);
+                
                 PosUnit[0] = pt.x - (newWidth / 2);
                 PosUnit[1] = pt.y - (newHeight / 2);
-            }
+                
+            }*/
+            
         }
         delete unit;
 
@@ -262,6 +300,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             SelectUnit = true;
         }
+
+        
 
         if (SelectUnit)
         {
