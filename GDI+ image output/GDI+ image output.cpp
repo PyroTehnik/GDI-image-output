@@ -64,13 +64,15 @@ void CharMove() {
         drawRectangle = true;
         SelectUnit = false;
     }
-    else
-    {
-        drawRectangle = false;
-    }
-    if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+
+    if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) //unselect unit on ESC
     {
         SelectUnit = false;
+        //drawRectangle = false;
+        RectSXStart = 0;
+        RectSYStart = 0;
+        RectSXEnd = 0;
+        RectSYEnd = 0;
     }
 }
 
@@ -169,7 +171,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_LBUTTONDOWN:
+    case (WM_LBUTTONDOWN):
         drawRectangle = true;
         RectSXStart = GET_X_LPARAM(lParam);
         RectSYStart = GET_Y_LPARAM(lParam);
@@ -187,7 +189,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
 
-    case WM_LBUTTONUP:
+    case (WM_LBUTTONUP):
         drawRectangle = false;
         ReleaseCapture();
         InvalidateRect(hWnd, nullptr, FALSE);
