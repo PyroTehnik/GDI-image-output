@@ -28,13 +28,11 @@ int Y = GetSystemMetrics(SM_CYSCREEN);
 //    int HitboxUnit;
 //    int NumberUnit;
 //};
+// 
+//unit pose 0
 int PosUnit[] = { 100, 100 };
 int HitboxUnit[] = { 100 + 50, 100 + 50 };
 int NumberUnit;
-
-//unit pose 0
-int PosUnitX = 100;
-int PosUnitY = 100;
 
 int newWidth = 50;
 int newHeight = 50;
@@ -44,6 +42,12 @@ int RectSXStart = 0;
 int RectSYStart = 0;
 int RectSXEnd = 0;
 int RectSYEnd = 0;
+
+POINT pt;
+
+
+int Xmouse = pt.x;
+int Ymouse = pt.y;
 
 //char control move
 void CharMove() {
@@ -169,9 +173,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+
     switch (message)
     {
-    case (WM_LBUTTONDOWN):
+    case WM_LBUTTONDOWN:
         drawRectangle = true;
         RectSXStart = GET_X_LPARAM(lParam);
         RectSYStart = GET_Y_LPARAM(lParam);
@@ -189,7 +194,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
 
-    case (WM_LBUTTONUP):
+    case WM_LBUTTONUP:
         drawRectangle = false;
         ReleaseCapture();
         InvalidateRect(hWnd, nullptr, FALSE);
@@ -229,7 +234,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             backGraphics->DrawImage(unit, PosUnit[0], PosUnit[1], newWidth, newHeight);
 
-            
+            if ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) && SelectUnit)
+            {
+                GetCursorPos(&pt);
+                ScreenToClient(hWnd, &pt);
+                PosUnit[0] = pt.x - (newWidth / 2);
+                PosUnit[1] = pt.y - (newHeight / 2);
+            }
         }
         delete unit;
 
@@ -254,6 +265,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         if (SelectUnit)
         {
+            
             Gdiplus::Graphics graph(hdc);
             Gdiplus::Pen RectCol(Gdiplus::Color(255, 100, 255, 0), 2);
             Gdiplus::Rect RectPos(PosUnit[0], PosUnit[1], newWidth, newHeight);
