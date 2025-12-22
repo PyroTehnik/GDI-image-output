@@ -49,8 +49,9 @@ int RectSXEnd = 0;
 int RectSYEnd = 0;
 
 POINT pt;
-
-int OPU[] = { PosUnit[0]+ pt.x ,PosUnit[1]+ pt.y };
+int PosTrack[] = { 100,100 };
+int OldPosTrack[] = { 100,100 };
+int RefTrack[] = { 100,100 };
 
 //char control move
 void CharMove() {
@@ -211,6 +212,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             PosUnit[0] = pt.x - (newWidth / 2);
             PosUnit[1] = pt.y - (newHeight / 2);
+
         }
         
 
@@ -253,12 +255,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             backGraphics->DrawLine(&LineCol, 1, 1, pt.x, pt.y);
             delete Pos;*/
 
-            vector<int>pos;
-            pos.push_back(PosUnit[0] + (newWidth / 2));
-            pos.push_back(PosUnit[1] + (newHeight / 2));
+            if (!(GetKeyState(VK_RBUTTON) & 0x8000)) 
+            {
+                RefTrack[0] = pt.x;
+                RefTrack[1] = pt.y;
+                
+            }
+            else
+            {
+                OldPosTrack[0] = RefTrack[0];
+                OldPosTrack[1] = RefTrack[1];
+                PosTrack[0] = pt.x;
+                PosTrack[1] = pt.y;
+            };
+
+            
             Gdiplus::Graphics LineMove(hdc);
             Gdiplus::Pen LineCol(Gdiplus::Color(255, 100, 255, 0), 2);
-            backGraphics->DrawLine(&LineCol, pos[0], pos[1], pt.x, pt.y);
+            backGraphics->DrawLine(&LineCol, OldPosTrack[0], OldPosTrack[1], PosTrack[0], PosTrack[1]);
         }
 
         //draw unit
